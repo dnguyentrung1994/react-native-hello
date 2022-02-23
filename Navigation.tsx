@@ -7,6 +7,7 @@ import React from 'react';
 import store from './redux/store';
 import Home from './screens/Home';
 import Details from './screens/Details';
+import UserIcon from './components/common/UserIcon';
 
 export default function Navigation() {
   const Tab = createBottomTabNavigator();
@@ -17,7 +18,7 @@ export default function Navigation() {
         <Tab.Navigator
           initialRouteName="Home"
           screenOptions={({ route }) => ({
-            tabBarIcon: ({ focused, color, size }) => {
+            tabBarIcon: ({ focused }) => {
               let iconName: string = '';
 
               switch (route.name) {
@@ -44,9 +45,8 @@ export default function Navigation() {
                 />
               );
             },
-            tabBarActiveTintColor: 'tomato',
-            tabBarInactiveTintColor: 'gray',
-            headerShown: false,
+            headerShown: true,
+            headerRight: () => <UserIcon />,
           })}
         >
           <Tab.Screen name="Home" component={Home} />
