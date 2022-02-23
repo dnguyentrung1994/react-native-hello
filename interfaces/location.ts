@@ -10,3 +10,8 @@ export interface ILocation {
   Qty?: number | string;
   identify?: string;
 }
+
+export interface ILocationStore {
+  locate: ILocation;
+  listLocation: ILocation[];
+}

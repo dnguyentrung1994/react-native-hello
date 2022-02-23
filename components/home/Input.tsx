@@ -1,12 +1,10 @@
-import { Text, View } from 'react-native'
-import React, { Component } from 'react'
+import { View, Text } from 'react-native';
+import React from 'react';
 
-export default class Input extends Component {
-  render() {
-    return (
-      <View>
-        <Text>Input</Text>
-      </View>
-    )
-  }
+export default function Input() {
+  return (
+    <View>
+      <Text>Input</Text>
+    </View>
+  );
 }

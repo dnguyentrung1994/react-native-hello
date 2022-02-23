@@ -1,12 +1,13 @@
-import { Text, View } from 'react-native'
-import React, { Component } from 'react'
+import { View, Text } from 'react-native';
+import React from 'react';
+import { useAppState } from '../redux/store';
 
-export default class Home extends Component {
-  render() {
-    return (
-      <View>
-        <Text>Home</Text>
-      </View>
-    )
-  }
+export default function Home() {
+  const { location } = useAppState((state) => state);
+
+  return (
+    <View>
+      <Text>{location.locate.id}</Text>
+    </View>
+  );
 }
