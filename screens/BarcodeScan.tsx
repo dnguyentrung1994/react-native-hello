@@ -2,10 +2,12 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import BarcodeMask from 'react-native-barcode-mask';
+import { Button } from 'react-native-elements';
 import { setBarcodeData } from '../redux/location.store';
+import { useAppDispatch } from '../redux/store';
 
-const finderWidth: number = 280;
-const finderHeight: number = 230;
+const finderWidth: number = 200;
+const finderHeight: number = 200;
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 const viewMinX = (width - finderWidth) / 2;
@@ -14,7 +16,7 @@ const viewMinY = (height - finderHeight) / 2;
 export default function BarcodeScanScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
-
+  const dispatch = useAppDispatch();
   useEffect(() => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -27,8 +29,8 @@ export default function BarcodeScanScreen() {
     if (x >= viewMinX && y >= viewMinY && x <= viewMinX + finderWidth / 2 && y <= viewMinY + finderHeight / 2) {
     }
     setScanned(true);
-    setBarcodeData(data);
-    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    dispatch(setBarcodeData(data));
+    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
   };
 
   if (hasPermission === null) {
@@ -46,6 +48,7 @@ export default function BarcodeScanScreen() {
       >
         <BarcodeMask edgeColor="#62B1F6" showAnimatedLine />
       </BarCodeScanner>
+      {scanned && <Button title="Scan Again" onPress={() => setScanned(false)} />}
     </View>
   );
 }

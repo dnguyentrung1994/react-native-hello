@@ -8,9 +8,22 @@ import store from './redux/store';
 import Home from './screens/Home';
 import Details from './screens/Details';
 import UserIcon from './components/common/UserIcon';
+import BarcodeScanScreen from './screens/BarcodeScan';
 
 export default function Navigation() {
   const Tab = createBottomTabNavigator();
+  function HomeTabs() {
+    return (
+      <Tab.Navigator
+        screenOptions={() => ({
+          headerShown: false,
+        })}
+      >
+        <Tab.Screen name="Location" component={Home} />
+        <Tab.Screen name="Barcode" component={BarcodeScanScreen} />
+      </Tab.Navigator>
+    );
+  }
 
   return (
     <Provider store={store}>
@@ -49,8 +62,10 @@ export default function Navigation() {
             headerRight: () => <UserIcon />,
           })}
         >
-          <Tab.Screen name="Home" component={Home} />
-          <Tab.Screen name="Details" component={Details} />
+          <Tab.Group>
+            <Tab.Screen name="Home" component={HomeTabs} />
+            <Tab.Screen name="Details" component={Details} />
+          </Tab.Group>
         </Tab.Navigator>
       </NavigationContainer>
     </Provider>
