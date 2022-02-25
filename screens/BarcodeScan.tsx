@@ -6,8 +6,8 @@ import { Button } from 'react-native-elements';
 import { setBarcodeData } from '../redux/location.store';
 import { useAppDispatch } from '../redux/store';
 
-const finderWidth: number = 200;
-const finderHeight: number = 200;
+const finderWidth: number = 300;
+const finderHeight: number = 300;
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 const viewMinX = (width - finderWidth) / 2;
@@ -27,10 +27,10 @@ export default function BarcodeScanScreen() {
   const handleBarCodeScanned = ({ type, data, bounds: { origin } }: any) => {
     const { x, y } = origin;
     if (x >= viewMinX && y >= viewMinY && x <= viewMinX + finderWidth / 2 && y <= viewMinY + finderHeight / 2) {
+      setScanned(true);
+      dispatch(setBarcodeData(data));
+      alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     }
-    setScanned(true);
-    dispatch(setBarcodeData(data));
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
   };
 
   if (hasPermission === null) {
@@ -39,6 +39,7 @@ export default function BarcodeScanScreen() {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
+  console.log(width, height, viewMinX, viewMinY);
   return (
     <View style={{ flex: 1 }}>
       <BarCodeScanner
@@ -46,7 +47,7 @@ export default function BarcodeScanScreen() {
         barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
         style={[StyleSheet.absoluteFillObject, styles.barcodeArea]}
       >
-        <BarcodeMask edgeColor="#62B1F6" showAnimatedLine />
+        <BarcodeMask width={finderWidth - 150} height={finderHeight - 150} edgeColor="#62B1F6" showAnimatedLine />
       </BarCodeScanner>
       {scanned && <Button title="Scan Again" onPress={() => setScanned(false)} />}
     </View>
