@@ -39,7 +39,7 @@ export default function BarcodeScanScreen() {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
-  console.log(width, height, viewMinX, viewMinY);
+  console.log(scanned);
   return (
     <View style={{ flex: 1 }}>
       <BarCodeScanner
@@ -47,9 +47,17 @@ export default function BarcodeScanScreen() {
         barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
         style={[StyleSheet.absoluteFillObject, styles.barcodeArea]}
       >
-        <BarcodeMask width={finderWidth - 150} height={finderHeight - 150} edgeColor="#62B1F6" showAnimatedLine />
+        <BarcodeMask
+          width={finderWidth - 150}
+          height={finderHeight - 150}
+          edgeColor="#62B1F6"
+          showAnimatedLine={false}
+          outerMaskOpacity={0.7}
+        />
       </BarCodeScanner>
-      {scanned && <Button title="Scan Again" onPress={() => setScanned(false)} />}
+      <View style={styles.scanAgainButton}>
+        {scanned && <Button title="Scan Again" onPress={() => setScanned(false)} />}
+      </View>
     </View>
   );
 }
@@ -58,5 +66,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  scanAgainButton: {
+    bottom: 0,
+    width: '100%',
+    display: 'flex',
+    position: 'absolute',
   },
 });

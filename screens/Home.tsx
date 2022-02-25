@@ -6,13 +6,14 @@ import BarcodeMask from 'react-native-barcode-mask';
 
 export default function Home() {
   const { location } = useAppState((state) => state);
-
   return (
     <View>
-      {location.barcodeData !== '' && <Text>{location.barcodeData}</Text>}
-      <TouchableOpacity onPress={() => {}}>
-        <Text>Read barcode?</Text>
-      </TouchableOpacity>
+      {location.barcodeData !== '' && (
+        <View>
+          <Text>productCode: {location.barcodeData.split('')[2].slice(1).trim()}</Text>
+          <Text>orderCode: {location.barcodeData.split('')[9].slice(1).trim()}</Text>
+        </View>
+      )}
     </View>
   );
 }
