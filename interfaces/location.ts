@@ -14,4 +14,5 @@ export interface ILocation {
 export interface ILocationStore {
   locate: ILocation;
   listLocation: ILocation[];
+  barcodeData: string;
 }

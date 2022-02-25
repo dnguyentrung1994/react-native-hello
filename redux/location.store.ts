@@ -7,6 +7,7 @@ const initialState: ILocationStore = {
     Pro_No: '',
   },
   listLocation: [],
+  barcodeData: '',
 };
 const locationSlice = createSlice({
   name: 'location',
@@ -15,9 +16,12 @@ const locationSlice = createSlice({
     setLocation(state, action: PayloadAction<Partial<ILocation>>) {
       Object.assign(state, action.payload);
     },
+    setBarcodeData(state, action: PayloadAction<string>) {
+      state.barcodeData = action.payload;
+    },
   },
 });
 
-export const { setLocation } = locationSlice.actions;
+export const { setLocation, setBarcodeData } = locationSlice.actions;
 
 export default locationSlice.reducer;
