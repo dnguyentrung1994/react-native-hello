@@ -5,7 +5,7 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import BarcodeMask from 'react-native-barcode-mask';
 import { Button } from 'react-native-elements';
 import MyButtonArea from '../components/common/MyButtonArea';
-import { setBarcodeData } from '../redux/location.store';
+import { setBarcodeData } from '../redux/location.slice';
 import { useAppDispatch } from '../redux/store';
 
 const finderWidth: number = 300;
