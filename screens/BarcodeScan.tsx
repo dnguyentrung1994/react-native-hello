@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BarcodeMask from 'react-native-barcode-mask';
 import { Button } from 'react-native-elements';
+import MyButtonArea from '../components/common/MyButtonArea';
 import { setBarcodeData } from '../redux/location.store';
 import { useAppDispatch } from '../redux/store';
 
@@ -46,7 +47,6 @@ export default function BarcodeScanScreen({ navigation }: any) {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
-  console.log(scanned);
   return isFocus ? (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
@@ -67,44 +67,18 @@ export default function BarcodeScanScreen({ navigation }: any) {
 
       {scanned && (
         <View style={styles.scanAgainArea}>
-          <Button
-            title={'Back'}
-            icon={{
-              name: 'arrow-left',
-              type: 'font-awesome',
-              size: 15,
-              color: 'white',
-            }}
-            buttonStyle={{
-              backgroundColor: 'rgba(244, 132, 42, 0.8)',
-              borderColor: 'transparent',
-              borderWidth: 0,
-              borderRadius: 30,
-            }}
-            containerStyle={{
-              width: '100%',
-              marginVertical: 10,
-            }}
+          <MyButtonArea
+            title="Back"
+            icon="arrow-left"
+            iconFamily="font-awesome"
+            buttonColor="rgba(244, 132, 42, 0.8)"
             onPress={() => navigation.navigate('Location')}
           />
-          <Button
-            title={'Scan Again'}
-            icon={{
-              name: 'redo',
-              type: 'font-awesome-5',
-              size: 15,
-              color: 'white',
-            }}
-            buttonStyle={{
-              backgroundColor: 'rgba(42, 150, 244, 0.8)',
-              borderColor: 'transparent',
-              borderWidth: 0,
-              borderRadius: 30,
-            }}
-            containerStyle={{
-              width: '100%',
-              marginVertical: 10,
-            }}
+          <MyButtonArea
+            title="Scan Again"
+            icon="redo"
+            iconFamily="font-awesome-5"
+            buttonColor="rgba(42, 150, 244, 0.8)"
             onPress={() => setScanned(false)}
           />
         </View>

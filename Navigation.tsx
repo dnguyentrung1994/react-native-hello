@@ -17,10 +17,23 @@ export default function Navigation() {
       <Tab.Navigator
         screenOptions={() => ({
           headerShown: false,
+          tabBarStyle: { display: 'none' },
         })}
       >
-        <Tab.Screen name="Location" component={Home} />
-        <Tab.Screen name="Barcode" component={BarcodeScanScreen} />
+        <Tab.Screen
+          name="Location"
+          options={{
+            title: 'ロケーション',
+          }}
+          component={Home}
+        />
+        <Tab.Screen
+          name="Barcode"
+          options={{
+            title: 'バーコード',
+          }}
+          component={BarcodeScanScreen}
+        />
       </Tab.Navigator>
     );
   }
@@ -63,7 +76,7 @@ export default function Navigation() {
           })}
         >
           <Tab.Group>
-            <Tab.Screen name="Home" component={HomeTabs} />
+            <Tab.Screen name="Home" options={{}} component={HomeTabs} />
             <Tab.Screen name="Details" component={Details} />
           </Tab.Group>
         </Tab.Navigator>
