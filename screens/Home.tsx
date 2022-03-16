@@ -2,12 +2,11 @@ import { Text, StyleSheet, View, Image, Dimensions, TouchableOpacity } from 'rea
 import React, { useEffect, useState } from 'react';
 import { useAppState } from '../redux/store';
 import ImageZoom from 'react-native-image-pan-zoom';
-import { useIsFocused } from '@react-navigation/native';
 import MyButtonArea from '../components/common/MyButtonArea';
 
 export default function Home({ navigation }: any) {
-  const isFocus = useIsFocused();
-  const { location } = useAppState((state) => state);
+  const { location, user, auth } = useAppState((state) => state);
+  console.log(auth);
   return (
     <View style={{ position: 'relative', flex: 1 }}>
       {location.barcodeData === '' ? (

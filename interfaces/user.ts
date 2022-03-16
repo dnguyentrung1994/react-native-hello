@@ -12,3 +12,8 @@ export interface IToken {
   iat: number;
   exp: number;
 }
+
+export interface ILoginForm {
+  username: string;
+  password: string;
+}

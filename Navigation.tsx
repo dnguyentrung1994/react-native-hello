@@ -1,17 +1,27 @@
-import { Provider } from 'react-redux';
+import { Provider, useDispatch } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-import React from 'react';
-import store from './redux/store';
+import React, { useEffect, useState } from 'react';
+import store, { useAppState } from './redux/store';
 import Home from './screens/Home';
 import Details from './screens/Details';
 import UserIcon from './components/common/UserIcon';
 import BarcodeScanScreen from './screens/BarcodeScan';
+import Login from './screens/Login';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuthToken } from './redux/auth.slice';
 
 export default function Navigation() {
   const Tab = createBottomTabNavigator();
+  const { auth } = useAppState((state) => state);
+  const [refreshToken, setRefreshToken] = useState<string>('');
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAuthToken());
+  }, []);
   function HomeTabs() {
     return (
       <Tab.Navigator
@@ -39,8 +49,8 @@ export default function Navigation() {
   }
 
   return (
-    <Provider store={store}>
-      <NavigationContainer>
+    <NavigationContainer>
+      {auth !== '' ? (
         <Tab.Navigator
           initialRouteName="Home"
           screenOptions={({ route }) => ({
@@ -80,7 +90,16 @@ export default function Navigation() {
             <Tab.Screen name="Details" component={Details} />
           </Tab.Group>
         </Tab.Navigator>
-      </NavigationContainer>
-    </Provider>
+      ) : (
+        <Tab.Navigator
+          screenOptions={() => ({
+            headerShown: false,
+            tabBarStyle: { display: 'none' },
+          })}
+        >
+          <Tab.Screen name="Login" options={{}} component={Login} />
+        </Tab.Navigator>
+      )}
+    </NavigationContainer>
   );
 }
