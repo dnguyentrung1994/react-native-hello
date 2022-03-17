@@ -11,12 +11,12 @@ import UserIcon from './components/common/UserIcon';
 import BarcodeScanScreen from './screens/BarcodeScan';
 import Login from './screens/Login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAuthToken } from './redux/auth.slice';
+import { getAuthToken, setAuth } from './redux/auth.slice';
+import Loading from './screens/loading';
 
 export default function Navigation() {
   const Tab = createBottomTabNavigator();
   const { auth } = useAppState((state) => state);
-  const [refreshToken, setRefreshToken] = useState<string>('');
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function Navigation() {
 
   return (
     <NavigationContainer>
-      {auth !== '' ? (
+      {auth.refreshToken === true ? (
         <Tab.Navigator
           initialRouteName="Home"
           screenOptions={({ route }) => ({
@@ -90,7 +90,7 @@ export default function Navigation() {
             <Tab.Screen name="Details" component={Details} />
           </Tab.Group>
         </Tab.Navigator>
-      ) : (
+      ) : auth.refreshToken === false ? (
         <Tab.Navigator
           screenOptions={() => ({
             headerShown: false,
@@ -98,6 +98,15 @@ export default function Navigation() {
           })}
         >
           <Tab.Screen name="Login" options={{}} component={Login} />
+        </Tab.Navigator>
+      ) : (
+        <Tab.Navigator
+          screenOptions={() => ({
+            headerShown: false,
+            tabBarStyle: { display: 'none' },
+          })}
+        >
+          <Tab.Screen name="Loading" options={{}} component={Loading} />
         </Tab.Navigator>
       )}
     </NavigationContainer>

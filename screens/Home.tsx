@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { useAppState } from '../redux/store';
 import ImageZoom from 'react-native-image-pan-zoom';
 import MyButtonArea from '../components/common/MyButtonArea';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home({ navigation }: any) {
-  const { location, user, auth } = useAppState((state) => state);
-  console.log(auth);
+  const { location, auth } = useAppState((state) => state);
+
   return (
     <View style={{ position: 'relative', flex: 1 }}>
       {location.barcodeData === '' ? (

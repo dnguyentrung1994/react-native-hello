@@ -6,11 +6,10 @@ import { ILoginForm } from '../interfaces/user';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { loginAsync } from '../redux/user.slice';
+import { loginAsync } from '../redux/auth.slice';
 
 export default function Login({ navigation }: any) {
   const dispatch = useAppDispatch();
-  const { user } = useAppState((state) => state);
   const validationSchema = yup.object({
     username: yup
       .string()
@@ -35,10 +34,7 @@ export default function Login({ navigation }: any) {
     resolver: yupResolver(validationSchema),
   });
   const onSubmit = (data: ILoginForm) => {
-    dispatch(loginAsync(data)).then(() => {
-      console.log(user);
-      navigation.navigate('Location');
-    });
+    dispatch(loginAsync(data));
   };
   return (
     <View style={styles.loginForm}>

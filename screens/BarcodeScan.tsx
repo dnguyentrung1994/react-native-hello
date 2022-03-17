@@ -34,7 +34,14 @@ export default function BarcodeScanScreen({ navigation }: any) {
 
   const handleBarCodeScanned = ({ type, data, bounds: { origin } }: any) => {
     const { x, y } = origin;
-    if (x >= viewMinX && y >= viewMinY && x <= viewMinX + finderWidth / 2 && y <= viewMinY + finderHeight / 2) {
+    if (
+      x >= viewMinX &&
+      y >= viewMinY &&
+      x <= viewMinX + finderWidth / 2 &&
+      y <= viewMinY + finderHeight / 2 &&
+      type === BarCodeScanner.Constants.BarCodeType.qr &&
+      data.slice(0, 3) === '[)>'
+    ) {
       setScanned(true);
       dispatch(setBarcodeData(data));
       alert(`Bar code with type ${type} and data ${data} has been scanned!`);

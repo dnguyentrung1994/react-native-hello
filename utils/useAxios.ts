@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import { IToken } from '../interfaces/user';
 
 const useAxios = async () => {
-  const { accessToken } = useAppState((state) => state.user);
+  const { accessToken } = useAppState((state) => state.auth.userData);
   const refreshToken = await AsyncStorage.getItem('refresh-token');
 
   const axiosInstance = axios.create({

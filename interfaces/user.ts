@@ -7,6 +7,11 @@ export interface IUser {
   accessToken: string;
 }
 
+export interface IAuth {
+  refreshToken: boolean | null;
+  userData: IUser;
+}
+
 export interface IToken {
   id: number;
   iat: number;
