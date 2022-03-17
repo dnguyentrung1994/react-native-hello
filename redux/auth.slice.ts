@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createSlice, Dispatch, PayloadAction } from '@reduxjs/toolkit';
 import { IAuth, ILoginForm, IUser } from '../interfaces/user';
-import unmanagedInstance from '../utils/axios';
+import unmanagedInstance from '../utils/UnmanagedAxiosInstance';
 
 const initialState: IAuth = {
   refreshToken: null,

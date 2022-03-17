@@ -12,7 +12,7 @@ import BarcodeScanScreen from './screens/BarcodeScan';
 import Login from './screens/Login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuthToken, setAuth } from './redux/auth.slice';
-import Loading from './screens/loading';
+import Loading from './screens/Loading';
 
 export default function Navigation() {
   const Tab = createBottomTabNavigator();

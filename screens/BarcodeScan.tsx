@@ -5,7 +5,7 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import BarcodeMask from 'react-native-barcode-mask';
 import { Button } from 'react-native-elements';
 import MyButtonArea from '../components/common/MyButtonArea';
-import { setBarcodeData } from '../redux/location.slice';
+import { getLocation, setBarcodeData } from '../redux/location.slice';
 import { useAppDispatch } from '../redux/store';
 
 const finderWidth: number = 300;
@@ -44,7 +44,8 @@ export default function BarcodeScanScreen({ navigation }: any) {
     ) {
       setScanned(true);
       dispatch(setBarcodeData(data));
-      alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+      dispatch(getLocation(data.split('')[2].slice(1).trim()));
+      navigation.navigate('Location');
     }
   };
 

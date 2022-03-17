@@ -8,7 +8,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { loginAsync } from '../redux/auth.slice';
 
-export default function Login({ navigation }: any) {
+export default function Login() {
   const dispatch = useAppDispatch();
   const validationSchema = yup.object({
     username: yup
