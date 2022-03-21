@@ -14,10 +14,16 @@ export interface ILocation {
 export interface IOrder {
   Pro_No: string;
   Order_Code: string;
+  deadline?: string;
+  isCompleted?: boolean;
+  isCanceled?: boolean;
+  quantity?: number;
   identify?: string;
+  error?: string;
 }
 export interface ILocationStore {
-  locate: IOrder;
-  listLocation: string[];
+  order: IOrder;
+  listLocation?: string[];
   barcodeData: string;
+  warning?: string;
 }

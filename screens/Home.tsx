@@ -1,21 +1,24 @@
 import { Text, StyleSheet, View, Image } from 'react-native';
-import React from 'react';
-import { useAppState } from '../redux/store';
+import React, { useState } from 'react';
+import { useAppDispatch, useAppState } from '../redux/store';
 import ImageZoom from 'react-native-image-pan-zoom';
-import MyButtonArea from '../components/common/MyButtonArea';
 import ContentLoader, { Rect } from 'react-content-loader/native';
+import { FAB, SpeedDial } from 'react-native-elements';
+import { addItem } from '../redux/prepareList.slice';
 
 export default function Home({ navigation }: any) {
-  const { location, auth } = useAppState((state) => state);
-
+  const { location } = useAppState((state) => state);
+  const [openSpeedDial, setOpenSpeedDial] = useState(false);
+  const dispatch = useAppDispatch();
   return location.barcodeData === '' ? (
     <View style={styles.container}>
       <View style={styles.barCodeScanArea}>
-        <MyButtonArea
+        <FAB
           title="QR"
-          icon="qrcode"
-          iconFamily="font-awesome"
-          buttonColor="rgba(42, 150, 244, 0.8)"
+          icon={{
+            name: 'qr-code-scanner',
+            color: 'white',
+          }}
           onPress={() => navigation.navigate('Barcode')}
         />
       </View>
@@ -25,29 +28,84 @@ export default function Home({ navigation }: any) {
       <View style={styles.textAreaStyling}>
         <View style={styles.headerText}>
           <Text style={{ fontSize: 20 }}>
-            製品番号: <Text style={styles.infoText}> {location.locate.Pro_No}</Text>
+            製品番号: <Text style={styles.infoText}> {location.order.Pro_No}</Text>
           </Text>
 
           <Text style={{ fontSize: 20 }}>
-            注文番号: <Text style={styles.infoText}>{location.locate.Order_Code}</Text>
+            注文番号: <Text style={styles.infoText}>{location.order.Order_Code}</Text>
           </Text>
         </View>
         <View style={styles.workspace}>
+          {location.warning && <Text style={{ fontSize: 24, fontWeight: 'bold' }}>{location.warning}</Text>}
           <View style={styles.locationArea}>
-            <Text style={{ fontSize: 20 }}>ロケーション: </Text>
-            {location.listLocation.map((location, index) => (
-              <Text style={styles.locationData} key={index}>
-                {location}
-              </Text>
-            ))}
+            <Text style={styles.locationLabel}>ロケーション: </Text>
+
+            {location.listLocation ? (
+              location.listLocation.map((location, index) => (
+                <Text style={styles.locationData} key={index}>
+                  {location}
+                </Text>
+              ))
+            ) : (
+              <ContentLoader
+                speed={1}
+                interval={0.15}
+                width={580}
+                height={480}
+                viewBox="0 20 580 480"
+                backgroundColor="#d3d3d3"
+                foregroundColor="#ecebeb"
+              >
+                {[...new Array(5).fill(1)].map((_, index) => (
+                  <Rect key={index} x="20" y={(index + 1) * 25} rx="4" ry="4" width="100" height="16" />
+                ))}
+              </ContentLoader>
+            )}
           </View>
-          <View style={styles.operationArea}></View>
+          <View style={styles.operationArea}>
+            <Text style={styles.locationLabel}>注文状態: </Text>
+            {location.order.deadline || location.order.error ? (
+              <View>
+                {location.order.deadline && (
+                  <View>
+                    <Text style={styles.locationData}>
+                      納期: <Text>{location.order.deadline}</Text>
+                    </Text>
+                    <Text style={styles.locationData}>
+                      数量: <Text>{location.order.quantity}</Text>
+                    </Text>
+                  </View>
+                )}
+                {location.order.error && (
+                  <View>
+                    <Text style={styles.locationData}>
+                      エラー: <Text>{location.order.error}</Text>
+                    </Text>
+                  </View>
+                )}
+              </View>
+            ) : (
+              <ContentLoader
+                speed={1}
+                interval={0.15}
+                width={580}
+                height={480}
+                viewBox="0 20 580 480"
+                backgroundColor="#d3d3d3"
+                foregroundColor="#ecebeb"
+              >
+                {[...new Array(5).fill(1)].map((_, index) => (
+                  <Rect key={index} x="20" y={(index + 1) * 25} rx="4" ry="4" width="100" height="16" />
+                ))}
+              </ContentLoader>
+            )}
+          </View>
         </View>
       </View>
       <View style={styles.imageAreaStyling}>
-        {location.locate?.identify && location.locate.identify !== '' ? (
+        {location.order?.identify && location.order.identify !== '' ? (
           <ImageZoom cropWidth={580} cropHeight={480} imageWidth={600} imageHeight={400}>
-            <Image style={{ width: 600, height: 400 }} source={{ uri: location.locate?.identify }} />
+            <Image style={{ width: 600, height: 400 }} source={{ uri: location.order?.identify }} />
           </ImageZoom>
         ) : (
           <ContentLoader
@@ -65,14 +123,43 @@ export default function Home({ navigation }: any) {
           </ContentLoader>
         )}
       </View>
-      <View style={styles.barCodeScanArea}>
-        <MyButtonArea
-          title="QR"
-          icon="qrcode"
-          iconFamily="font-awesome"
-          buttonColor="rgba(42, 150, 122, 0.8)"
-          onPress={() => navigation.navigate('Barcode')}
-        />
+      <View style={styles.speedDial}>
+        <SpeedDial
+          isOpen={openSpeedDial}
+          color="red"
+          icon={{ name: 'edit', color: '#fff' }}
+          openIcon={{ name: 'close', color: '#fff' }}
+          onOpen={() => setOpenSpeedDial(!openSpeedDial)}
+          onClose={() => setOpenSpeedDial(!openSpeedDial)}
+          overlayColor="transparent"
+        >
+          <SpeedDial.Action
+            icon={{ name: 'qr-code-scanner', color: '#fff' }}
+            title="QR"
+            onPress={() => navigation.navigate('Barcode')}
+            color="rgba(42, 150, 122, 0.8)"
+            style={{ marginVertical: 10 }}
+            titleStyle={{ fontSize: 20 }}
+          />
+          <SpeedDial.Action
+            icon={{ name: 'add-shopping-cart', color: '#fff' }}
+            title="加える"
+            onPress={() =>
+              dispatch(
+                addItem({
+                  orderCode: location.order.Order_Code,
+                  productCode: location.order.Pro_No,
+                  quantity: location.order.quantity || 0,
+                  location: location.listLocation,
+                  identify: location.order.identify,
+                }),
+              )
+            }
+            style={{ marginVertical: 10 }}
+            titleStyle={{ fontSize: 20 }}
+            disabled={location.order.error !== undefined || location.order.isCompleted || location.order.isCanceled}
+          />
+        </SpeedDial>
       </View>
     </View>
   );
@@ -97,6 +184,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 10,
   },
 
   infoText: {
@@ -107,7 +195,8 @@ const styles = StyleSheet.create({
   workspace: {
     display: 'flex',
     justifyContent: 'space-between',
-    paddingTop: 30,
+    paddingTop: 20,
+    flexDirection: 'row',
   },
 
   //location data area styling
@@ -115,8 +204,14 @@ const styles = StyleSheet.create({
     width: '45%',
   },
 
+  locationLabel: {
+    fontSize: 20,
+    marginBottom: 10,
+  },
   locationData: {
     fontSize: 16,
+    marginLeft: 20,
+    paddingBottom: 9,
   },
 
   //operational area styling
@@ -148,5 +243,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     flexDirection: 'column',
     zIndex: 999,
+    backgroundColor: 'transparent',
+  },
+  speedDial: {
+    bottom: 0,
+    right: 0,
+    width: 200,
+    height: 200,
+    display: 'flex',
+    position: 'absolute',
+    flexDirection: 'column',
+    zIndex: 999,
+    backgroundColor: 'transparent',
   },
 });

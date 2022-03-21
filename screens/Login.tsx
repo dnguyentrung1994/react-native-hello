@@ -45,7 +45,16 @@ export default function Login() {
           required: true,
         }}
         render={({ field: { onChange, onBlur, value } }) => (
-          <Input style={{}} placeholder="ユーザー名" onBlur={onBlur} onChangeText={onChange} value={value} />
+          <Input
+            style={{}}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoFocus={true}
+            placeholder="ユーザー名"
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+          />
         )}
         name="username"
       />

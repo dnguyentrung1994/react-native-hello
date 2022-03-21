@@ -15,10 +15,12 @@ axiosInstance.interceptors.request.use(async (req) => {
   const authData = jsonData ? JSON.parse(jsonData) : null;
 
   if (authData?.refreshToken) {
-    const user: IToken = jwtDecode(authData.refreshToken);
-    const isExpired = dayjs.unix(user.exp);
+    const refreshToken: IToken = jwtDecode(authData.refreshToken);
+    const accessToken: IToken = jwtDecode(authData.userData.accessToken);
+    const refreshTokenExpireDate = dayjs.unix(refreshToken.exp);
+    const accessTokenExpireDate = dayjs.unix(accessToken.exp);
 
-    if (isExpired.diff(dayjs()) < 1) {
+    if (accessTokenExpireDate.diff(dayjs()) < 1 || refreshTokenExpireDate.diff(dayjs()) < 1) {
       const response = await axios.post(`${Constants?.manifest?.extra?.baseURL}/api/refresh_token`, null, {
         withCredentials: true,
         headers: {

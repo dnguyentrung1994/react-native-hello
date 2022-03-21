@@ -62,7 +62,7 @@ export default function Navigation() {
                   iconName = 'directions';
                   break;
                 case 'Details':
-                  iconName = 'info';
+                  iconName = 'list-alt';
                   break;
 
                 default:
@@ -86,8 +86,8 @@ export default function Navigation() {
           })}
         >
           <Tab.Group>
-            <Tab.Screen name="Home" options={{}} component={HomeTabs} />
-            <Tab.Screen name="Details" component={Details} />
+            <Tab.Screen name="Home" options={{ title: 'ホーム' }} component={HomeTabs} />
+            <Tab.Screen name="Details" options={{ title: '注番リスト' }} component={Details} />
           </Tab.Group>
         </Tab.Navigator>
       ) : auth.refreshToken === false ? (
