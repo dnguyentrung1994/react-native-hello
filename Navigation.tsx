@@ -1,17 +1,16 @@
-import { Provider, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-import React, { useEffect, useState } from 'react';
-import store, { useAppState } from './redux/store';
+import React, { useEffect } from 'react';
+import { useAppState } from './redux/store';
 import Home from './screens/Home';
 import Details from './screens/Details';
 import UserIcon from './components/common/UserIcon';
 import BarcodeScanScreen from './screens/BarcodeScan';
 import Login from './screens/Login';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAuthToken, setAuth } from './redux/auth.slice';
+import { getAuthToken } from './redux/auth.slice';
 import Loading from './screens/Loading';
 
 export default function Navigation() {
@@ -20,8 +19,9 @@ export default function Navigation() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getAuthToken());
+    dispatch(getAuthToken);
   }, []);
+
   function HomeTabs() {
     return (
       <Tab.Navigator

@@ -19,7 +19,7 @@ export default function Login() {
     password: yup
       .string()
       .required('パスワードを入力してください')
-      .min(6, 'パスワードの最短は6字です')
+      .min(4, 'パスワードの最短は4字です')
       .max(20, 'パスワードの最長は20字です'),
   });
   const {
