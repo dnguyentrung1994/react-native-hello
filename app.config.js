@@ -14,11 +14,12 @@ export default ({ config }) => {
       : process.env.BUILD_MODE === 'production'
       ? process.env.PRODUCTION_PORT
       : '';
-
+  const SocketPort = process.env.SOCKET_PORT;
   return {
     ...config,
     extra: {
       baseURL: `${BaseURL}:${Port}`,
+      socketURL: `${BaseURL}:${SocketPort}`,
     },
   };
 };

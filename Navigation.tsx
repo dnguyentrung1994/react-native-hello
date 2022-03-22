@@ -1,27 +1,57 @@
-import { Provider, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-import React, { useEffect, useState } from 'react';
-import store, { useAppState } from './redux/store';
+import React, { useEffect, useRef, useState } from 'react';
+import { useAppState } from './redux/store';
 import Home from './screens/Home';
 import Details from './screens/Details';
 import UserIcon from './components/common/UserIcon';
 import BarcodeScanScreen from './screens/BarcodeScan';
 import Login from './screens/Login';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAuthToken, setAuth } from './redux/auth.slice';
+import { getAuthToken } from './redux/auth.slice';
 import Loading from './screens/Loading';
+import Constants from 'expo-constants';
+import { io } from 'socket.io-client';
+import useWillMount from './utils/useWillMount';
+import { setSocket } from './redux/socket.slice';
 
+const socketEndpoint = Constants?.manifest?.extra?.socketURL;
 export default function Navigation() {
+  const mounted = useRef(false);
   const Tab = createBottomTabNavigator();
-  const { auth } = useAppState((state) => state);
+  const { userData, refreshToken } = useAppState((state) => state.auth);
   const dispatch = useDispatch();
+  const [hasConnection, setConnection] = useState(false);
 
-  useEffect(() => {
-    dispatch(getAuthToken());
-  }, []);
+  useWillMount(() => dispatch(getAuthToken()));
+  useEffect(
+    function didMount() {
+      if (refreshToken) {
+        const socket = io(socketEndpoint, {
+          transports: ['websocket'],
+        });
+
+        socket.io.once('open', () => {
+          setConnection(true);
+          dispatch(setSocket({ socket: socket }));
+          socket.emit('handshake', { username: userData.username });
+          socket.on('onlineList', (data) => {
+            console.log(data);
+          });
+        });
+
+        socket.io.on('close', () => setConnection(false));
+
+        return function didUnmount() {
+          socket.disconnect();
+          socket.removeAllListeners();
+        };
+      }
+    },
+    [refreshToken],
+  );
   function HomeTabs() {
     return (
       <Tab.Navigator
@@ -50,7 +80,7 @@ export default function Navigation() {
 
   return (
     <NavigationContainer>
-      {auth.refreshToken === true ? (
+      {refreshToken === true ? (
         <Tab.Navigator
           initialRouteName="Home"
           screenOptions={({ route }) => ({
@@ -90,7 +120,7 @@ export default function Navigation() {
             <Tab.Screen name="Details" options={{ title: '注番リスト' }} component={Details} />
           </Tab.Group>
         </Tab.Navigator>
-      ) : auth.refreshToken === false ? (
+      ) : refreshToken === false ? (
         <Tab.Navigator
           screenOptions={() => ({
             headerShown: false,
