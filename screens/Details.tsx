@@ -148,19 +148,18 @@ export default function Details({ navigation }: any) {
                         // await new Promise((r) => setTimeout(r, 500));
                         // dispatch(removeItem(item.orderCode));
                         dispatch(
-                          createShipment({
-                            orderCode: item.orderCode,
-                            quantity: item.quantity,
-                            preparedTime: dayjs().format('YYYY/MM/DD HH:mm:ss'),
-                          }),
+                          createShipment(
+                            {
+                              productCode: item.productCode,
+                              orderCode: item.orderCode,
+                              quantity: item.quantity,
+                              preparedTime: dayjs().format('YYYY/MM/DD HH:mm:ss'),
+                              user: userData.username,
+                            },
+                            socket,
+                          ),
                         );
-                        if (socket)
-                          socket.emit('prepareCompleted', {
-                            productCode: item.productCode,
-                            orderCode: item.orderCode,
-                            user: userData.username,
-                            time: dayjs().format('YYYY/MM/DD HH:mm:ss'),
-                          });
+
                         // Alert.alert('', '削除しました。', undefined, { cancelable: true });
                       },
                     },
