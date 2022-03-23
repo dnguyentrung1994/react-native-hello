@@ -12,45 +12,15 @@ import BarcodeScanScreen from './screens/BarcodeScan';
 import Login from './screens/Login';
 import { getAuthToken } from './redux/auth.slice';
 import Loading from './screens/Loading';
-import Constants from 'expo-constants';
-import { io } from 'socket.io-client';
 import useWillMount from './utils/useWillMount';
-import { setSocket } from './redux/socket.slice';
 
-const socketEndpoint = Constants?.manifest?.extra?.socketURL;
 export default function Navigation() {
   const Tab = createBottomTabNavigator();
   const { userData, refreshToken } = useAppState((state) => state.auth);
   const dispatch = useDispatch();
-  const [hasConnection, setConnection] = useState(false);
 
   useWillMount(() => dispatch(getAuthToken()));
-  useEffect(
-    function didMount() {
-      if (refreshToken) {
-        const socket = io(socketEndpoint, {
-          transports: ['websocket'],
-        });
 
-        socket.io.once('open', () => {
-          setConnection(true);
-          dispatch(setSocket({ socket: socket }));
-          socket.emit('handshake', { username: userData.username });
-          socket.on('onlineList', (data) => {
-            console.log(data);
-          });
-        });
-
-        socket.io.on('close', () => setConnection(false));
-
-        return function didUnmount() {
-          socket.disconnect();
-          socket.removeAllListeners();
-        };
-      }
-    },
-    [refreshToken],
-  );
   function HomeTabs() {
     return (
       <Tab.Navigator

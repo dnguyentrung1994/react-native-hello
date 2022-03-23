@@ -6,6 +6,8 @@ import { IItem } from '../interfaces/prepareItem';
 import { removeItem } from '../redux/prepareList.slice';
 import Constants from 'expo-constants';
 import { io } from 'socket.io-client';
+import dayjs from 'dayjs';
+import { createShipment } from '../redux/location.slice';
 
 const socketEndpoint = Constants?.manifest?.extra?.socketURL;
 export default function Details({ navigation }: any) {
@@ -13,11 +15,18 @@ export default function Details({ navigation }: any) {
 
   const { orderList } = useAppState((state) => state.prepareList);
   const { socket } = useAppState((state) => state.socketSlice);
+  const { userData } = useAppState((state) => state.auth);
 
   useEffect(() => {
     if (socket) {
       socket.emit('hello', 'world');
     }
+    return () => {
+      if (socket) {
+        socket.off('hello');
+        socket.off('prepareCompleted');
+      }
+    };
   }, [socket]);
 
   const ItemCard = ({ item }: { item: IItem }) => {
@@ -126,6 +135,37 @@ export default function Details({ navigation }: any) {
                   marginHorizontal: 40,
                   marginVertical: 15,
                 }}
+                onPress={() =>
+                  Alert.alert('処理完了', `${item.orderCode}というアイテムの処理は完了にしますか？`, [
+                    {
+                      text: 'キャンセル',
+                      style: 'cancel',
+                    },
+                    {
+                      text: '確認',
+                      onPress: async () => {
+                        // fadeOut();
+                        // await new Promise((r) => setTimeout(r, 500));
+                        // dispatch(removeItem(item.orderCode));
+                        dispatch(
+                          createShipment({
+                            orderCode: item.orderCode,
+                            quantity: item.quantity,
+                            preparedTime: dayjs().format('YYYY/MM/DD HH:mm:ss'),
+                          }),
+                        );
+                        if (socket)
+                          socket.emit('prepareCompleted', {
+                            productCode: item.productCode,
+                            orderCode: item.orderCode,
+                            user: userData.username,
+                            time: dayjs().format('YYYY/MM/DD HH:mm:ss'),
+                          });
+                        // Alert.alert('', '削除しました。', undefined, { cancelable: true });
+                      },
+                    },
+                  ])
+                }
               />
             </View>
           </View>

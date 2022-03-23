@@ -5,6 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const store = configureStore({
   reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 type AppState = ReturnType<typeof rootReducer>;

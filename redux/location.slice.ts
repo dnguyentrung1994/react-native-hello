@@ -1,4 +1,6 @@
 import { createSlice, Dispatch, PayloadAction } from '@reduxjs/toolkit';
+import { Alert } from 'react-native';
+import { Socket } from 'socket.io-client';
 import { ILocation, ILocationStore, IOrder } from '../interfaces/location';
 import ManagedInstance from '../utils/ManagedAxiosInstance';
 
@@ -92,3 +94,24 @@ export const getLocation = (qrcode: string) => async (dispatch: Dispatch) => {
     console.error(error.response.data);
   }
 };
+
+export const createShipment =
+  (
+    data: { productCode: string; orderCode: string; quantity: number; preparedTime: string; user: string },
+    socket: any,
+  ) =>
+  async (dispatch: Dispatch) => {
+    try {
+      ManagedInstance.post('api/exportMobile/shipment', {
+        shipmentData: { ...data, user: undefined, productCode: undefined },
+      }).then(() => {
+        socket &&
+          socket.emit('prepareCompleted', {
+            ...data,
+          });
+      });
+    } catch (error: any) {
+      console.error(error.response.data);
+      Alert.alert('エラー発生', error.response.data.message, [], { cancelable: true });
+    }
+  };

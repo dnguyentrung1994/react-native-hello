@@ -1,15 +1,44 @@
 import { Text, StyleSheet, View, Image } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppState } from '../redux/store';
 import ImageZoom from 'react-native-image-pan-zoom';
 import ContentLoader, { Rect } from 'react-content-loader/native';
 import { FAB, SpeedDial } from 'react-native-elements';
 import { addItem } from '../redux/prepareList.slice';
+import Constants from 'expo-constants';
+import { io } from 'socket.io-client';
+import { setSocket } from '../redux/socket.slice';
 
+const socketEndpoint = Constants?.manifest?.extra?.socketURL;
 export default function Home({ navigation }: any) {
   const { location } = useAppState((state) => state);
+  const { userData } = useAppState((state) => state.auth);
   const [openSpeedDial, setOpenSpeedDial] = useState(false);
   const dispatch = useAppDispatch();
+  const [hasConnection, setConnection] = useState(false);
+
+  useEffect(() => {
+    const socket = io(socketEndpoint, {
+      transports: ['websocket'],
+    });
+
+    socket.io.once('open', () => {
+      setConnection(true);
+      dispatch(setSocket({ socket: socket }));
+      socket.emit('handshake', { username: userData.username });
+      socket.on('onlineList', (data) => {
+        console.log(data);
+      });
+    });
+
+    socket.io.on('close', () => setConnection(false));
+
+    return () => {
+      socket.disconnect();
+      socket.removeAllListeners();
+    };
+  }, []);
+
   return location.barcodeData === '' ? (
     <View style={styles.container}>
       <View style={styles.barCodeScanArea}>
