@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppState } from './redux/store';
 import Home from './screens/Home';
 import Details from './screens/Details';
@@ -19,7 +19,6 @@ import { setSocket } from './redux/socket.slice';
 
 const socketEndpoint = Constants?.manifest?.extra?.socketURL;
 export default function Navigation() {
-  const mounted = useRef(false);
   const Tab = createBottomTabNavigator();
   const { userData, refreshToken } = useAppState((state) => state.auth);
   const dispatch = useDispatch();
