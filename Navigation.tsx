@@ -13,6 +13,7 @@ import Login from './screens/Login';
 import { getAuthToken } from './redux/auth.slice';
 import Loading from './screens/Loading';
 import useWillMount from './utils/useWillMount';
+import CheckScreen from './screens/CheckScreen';
 
 export default function Navigation() {
   const Tab = createBottomTabNavigator();
@@ -63,7 +64,9 @@ export default function Navigation() {
                 case 'Details':
                   iconName = 'list-alt';
                   break;
-
+                case 'ShipmentCheck':
+                  iconName = 'check-double';
+                  break;
                 default:
                   throw Error('Missing Screen!');
               }
@@ -87,6 +90,7 @@ export default function Navigation() {
           <Tab.Group>
             <Tab.Screen name="Home" options={{ title: 'ホーム' }} component={HomeTabs} />
             <Tab.Screen name="Details" options={{ title: '注番リスト' }} component={Details} />
+            <Tab.Screen name="ShipmentCheck" options={{ title: 'ダブルチェック' }} component={CheckScreen} />
           </Tab.Group>
         </Tab.Navigator>
       ) : refreshToken === false ? (

@@ -1,16 +1,17 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useAppState } from '../../redux/store';
 
 const UserIcon = () => {
   const navigation = useNavigation();
-  const { avatar } = useAppState((state) => state.auth.userData);
+  const { avatar, fullname } = useAppState((state) => state.auth.userData);
   return (
     <View style={styles.avatar}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.displayArea} onPress={() => navigation.goBack()}>
+        <Text style={styles.fullName}>{fullname}</Text>
         <Avatar
           size={32}
           source={{
@@ -29,6 +30,15 @@ const styles = StyleSheet.create({
   avatar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    marginRight: 10,
+  },
+
+  displayArea: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+
+  fullName: {
     marginRight: 10,
   },
 });
