@@ -12,4 +12,5 @@ export interface IShipment {
 export interface IShipmentList {
   myShipments: IShipment[];
   otherShipments: IShipment[];
+  checking?: IShipment;
 }

@@ -1,5 +1,5 @@
 import { Text, StyleSheet, View, Image } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useAppState } from '../redux/store';
 import ImageZoom from 'react-native-image-pan-zoom';
 import ContentLoader, { Rect } from 'react-content-loader/native';
@@ -8,36 +8,77 @@ import { addItem } from '../redux/prepareList.slice';
 import Constants from 'expo-constants';
 import { io } from 'socket.io-client';
 import { setSocket } from '../redux/socket.slice';
+import useWillMount from '../utils/useWillMount';
+import { addShipment, getShipments, updateCheckShipment } from '../redux/shipments.slice';
 
 const socketEndpoint = Constants?.manifest?.extra?.socketURL;
 export default function Home({ navigation }: any) {
-  const { location } = useAppState((state) => state);
+  const { location, socketSlice, prepareList, shipmentsSlice } = useAppState((state) => state);
   const { userData } = useAppState((state) => state.auth);
   const [openSpeedDial, setOpenSpeedDial] = useState(false);
+  const [AddButtonDisabled, setAddButtonDisabled] = useState(false);
   const dispatch = useAppDispatch();
-  const [hasConnection, setConnection] = useState(false);
 
+  useWillMount(() => dispatch(getShipments()));
   useEffect(() => {
-    const socket = io(socketEndpoint, {
+    const newSocket = io(socketEndpoint, {
       transports: ['websocket'],
     });
 
-    socket.io.once('open', () => {
-      setConnection(true);
-      dispatch(setSocket({ socket: socket }));
-      socket.emit('handshake', { username: userData.username });
-      socket.on('onlineList', (data) => {
-        console.log(data);
-      });
+    newSocket.io.once('open', () => {
+      dispatch(setSocket({ socket: newSocket }));
+      newSocket.emit('handshake', { username: userData.username });
+
+      // For getting online users on startup, which is not yet necessary at the moment.
+      // Enable this if needed.
+
+      // socket.on('onlineList', (data) => {
+      //   console.log(data)_
+      // })_
     });
 
-    socket.io.on('close', () => setConnection(false));
-
     return () => {
-      socket.disconnect();
-      socket.removeAllListeners();
+      newSocket.disconnect();
+      newSocket.removeAllListeners();
     };
   }, []);
+
+  useEffect(() => {
+    if (socketSlice.socket) {
+      socketSlice.socket.on('toClient-updateShipmentList', (data) => {
+        dispatch(addShipment(data));
+      });
+      socketSlice.socket.on('toClient-updateCheckStatus', (data) => {
+        dispatch(updateCheckShipment(data));
+      });
+    }
+  }, [socketSlice.socket]);
+
+  useEffect(() => {
+    if (location.order.readOnlyOrder) {
+      setAddButtonDisabled(true);
+      return;
+    }
+    if (prepareList.orderList.find((order) => order.orderCode === location.order.Order_Code) !== undefined) {
+      setAddButtonDisabled(true);
+      return;
+    }
+    if (shipmentsSlice.myShipments.find((shipment) => shipment.orderCode === location.order.Order_Code) !== undefined) {
+      setAddButtonDisabled(true);
+      return;
+    }
+    if (
+      shipmentsSlice.otherShipments.find((shipment) => shipment.orderCode === location.order.Order_Code) !== undefined
+    ) {
+      setAddButtonDisabled(true);
+      return;
+    }
+    if (shipmentsSlice.checking?.orderCode === location.order.Order_Code) {
+      setAddButtonDisabled(true);
+      return;
+    }
+    setAddButtonDisabled(false);
+  }, [prepareList.orderList, shipmentsSlice.checking, shipmentsSlice.myShipments, shipmentsSlice.otherShipments]);
 
   return location.barcodeData === '' ? (
     <View style={styles.container}>
@@ -102,6 +143,12 @@ export default function Home({ navigation }: any) {
                     </Text>
                     <Text style={styles.locationData}>
                       数量: <Text>{location.order.quantity}</Text>
+                    </Text>
+                    <Text style={styles.locationData}>
+                      次工程: <Text>{location.order.nextProcess}</Text>
+                    </Text>
+                    <Text style={styles.locationData}>
+                      納入先: <Text>{location.order.deliverPoint}</Text>
                     </Text>
                   </View>
                 )}
@@ -181,12 +228,14 @@ export default function Home({ navigation }: any) {
                   quantity: location.order.quantity || 0,
                   location: location.listLocation,
                   identify: location.order.identify,
+                  nextProcess: location.order.nextProcess,
+                  deliverPoint: location.order.deliverPoint,
                 }),
               )
             }
             style={{ marginVertical: 10 }}
             titleStyle={{ fontSize: 20 }}
-            disabled={location.order.error !== undefined || location.order.isCompleted || location.order.isCanceled}
+            disabled={AddButtonDisabled}
           />
         </SpeedDial>
       </View>

@@ -4,4 +4,6 @@ export interface IItem {
   quantity: number;
   location?: string[];
   identify?: string;
+  deliverPoint?: string;
+  nextProcess?: string;
 }

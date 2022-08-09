@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { Socket } from 'socket.io-client';
 import { ILocation, ILocationStore, IOrder } from '../interfaces/location';
 import ManagedInstance from '../utils/ManagedAxiosInstance';
+import { addMyShipment } from './shipments.slice';
 
 const initialState: ILocationStore = {
   order: {
@@ -43,6 +44,7 @@ export const getLocation = (qrcode: string) => async (dispatch: Dispatch) => {
         barcodeData: qrcode,
       }),
     );
+
     const { locationData, orderData, warning } = await (
       await ManagedInstance.get(`api/exportMobile/orderInfo/${orderCode}/${productCode}`)
     ).data;
@@ -81,6 +83,9 @@ export const getLocation = (qrcode: string) => async (dispatch: Dispatch) => {
           isCanceled: orderData.orderInfo.isCanceled === 1,
           quantity: orderData.orderInfo.quantity,
           identify: locationData.imageLists[0],
+          deliverPoint: orderData.orderInfo.deliverPoint,
+          nextProcess: orderData.orderInfo.nextProcess,
+          readOnlyOrder: orderData.readOnlyOrder,
         };
     dispatch(
       setLocation({
@@ -97,19 +102,41 @@ export const getLocation = (qrcode: string) => async (dispatch: Dispatch) => {
 
 export const createShipment =
   (
-    data: { productCode: string; orderCode: string; quantity: number; preparedTime: string; user: string },
+    inputData: {
+      productCode: string;
+      orderCode: string;
+      quantity: number;
+      preparedTime: string;
+      user: string;
+      identify: string;
+    },
     socket: any,
   ) =>
   async (dispatch: Dispatch) => {
     try {
-      ManagedInstance.post('api/exportMobile/shipment', {
-        shipmentData: { ...data, user: undefined, productCode: undefined },
-      }).then(() => {
-        socket &&
-          socket.emit('prepareCompleted', {
-            ...data,
-          });
-      });
+      const { shipment } = await (
+        await ManagedInstance.post('api/exportMobile/shipment', {
+          shipmentData: { ...inputData, user: undefined, productCode: undefined },
+        })
+      ).data;
+      dispatch(
+        addMyShipment({
+          id: shipment.id,
+          orderCode: shipment.orderCode,
+          productCode: inputData.productCode,
+          quantity: shipment.quantity,
+          preparedBy: shipment.preparedBy,
+          preparedTime: shipment.preparedTime,
+          identify: inputData.identify,
+        }),
+      );
+      socket &&
+        socket.emit('prepareCompleted', {
+          ...inputData,
+          preparedBy: shipment.preparedBy,
+          user: undefined,
+          id: shipment.id,
+        });
     } catch (error: any) {
       console.error(error.response.data);
       Alert.alert('エラー発生', error.response.data.message, [], { cancelable: true });

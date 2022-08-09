@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "react-native-hello",
-    "slug": "react-native-hello",
+    "name": "sonobe-export-app",
+    "slug": "sonobe-export-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.sonobese.exportApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"

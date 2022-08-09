@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createSlice, Dispatch, PayloadAction } from '@reduxjs/toolkit';
-import { IAuth, ILoginForm, IUser } from '../interfaces/user';
+import { IAuth, ILoginForm, IToken, IUser } from '../interfaces/user';
 import unmanagedInstance from '../utils/UnmanagedAxiosInstance';
+import jwtDecode from 'jwt-decode';
+import dayjs from 'dayjs';
 
 const initialState: IAuth = {
   refreshToken: null,
@@ -69,8 +71,22 @@ export const getAuthToken = () => async (dispatch: Dispatch) => {
 
       const payload = result ? JSON.parse(result) : '';
 
-      dispatch(setAuth(payload?.refreshToken || ''));
-      dispatch(setUserData(payload?.userData || null));
+      if (payload?.refreshToken) {
+        const refreshToken: IToken = jwtDecode(payload.refreshToken);
+        const refreshTokenExpireDate = dayjs.unix(refreshToken.exp);
+
+        if (refreshTokenExpireDate.diff(dayjs()) < 1) {
+          dispatch(setAuth(''));
+          dispatch(setUserData(null));
+        } else {
+          dispatch(setAuth(payload?.refreshToken || ''));
+          dispatch(setUserData(payload?.userData || null));
+        }
+      } else {
+        dispatch(setAuth(''));
+        dispatch(setUserData(null));
+      }
+
       return result || '';
     });
   } catch (error) {

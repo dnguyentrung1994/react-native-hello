@@ -19,6 +19,9 @@ export interface IOrder {
   isCanceled?: boolean;
   quantity?: number;
   identify?: string;
+  deliverPoint?: string;
+  nextProcess?: string;
+  readOnlyOrder?: boolean;
   error?: string;
 }
 export interface ILocationStore {
